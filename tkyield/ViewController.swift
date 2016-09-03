@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var emailInput: UITextField!
     @IBOutlet weak var passwordInput: UITextField!
     @IBOutlet weak var loginButton: UIButton!
-    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     var alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.Alert)
     let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { (result : UIAlertAction) -> Void in
         print("OK")
@@ -22,8 +22,14 @@ class ViewController: UIViewController {
     
     
     @IBAction func loginButton(sender: UIButton) {
-        if (sender as! NSObject == self.loginButton ){
+        if (sender as NSObject == self.loginButton ){
+            self.activityIndicator.startAnimating()
+            passwordInput.resignFirstResponder()
+            emailInput.resignFirstResponder()
+            UIApplication.sharedApplication().beginIgnoringInteractionEvents()
             NetworkManager.sharedInstance.makeAuthRequest(emailInput.text!, password: passwordInput.text!, completion: { (errorMessage) in
+                self.activityIndicator.stopAnimating()
+                UIApplication.sharedApplication().endIgnoringInteractionEvents()
                 if (errorMessage.empty()){
                     self.performSegueWithIdentifier("loginSegue", sender: self)
                 } else {
@@ -38,6 +44,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        activityIndicator.hidesWhenStopped = true;
         self.alertController.addAction(self.okAction)
         // Do any additional setup after loading the view, typically from a nib.
     }
