@@ -13,7 +13,7 @@ class UserPreferences {
     var access_token: String?
     static var sharedInstance = UserPreferences()
     
-    func setValues(json: NSDictionary) -> Void {
+    func setValues(_ json: NSDictionary) -> Void {
         self.name = json["name"] as? String
         self.profile_pic = json["profile_pic"] as? String
         self.access_token = json["access_token"] as? String

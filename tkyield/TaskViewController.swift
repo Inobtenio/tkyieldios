@@ -21,7 +21,7 @@ class TaskViewController: UIViewController, UIPickerViewDataSource, UIPickerView
         backButton.action = #selector(TaskViewController.backButtonPressed)
         backButton.title = "<  Back"
         self.navigationItem.leftBarButtonItem = backButton
-        let editButton = UIBarButtonItem.init(title: "Edit", style: UIBarButtonItemStyle.Done, target: self, action: #selector(TaskViewController.goToEditTaskView))
+        let editButton = UIBarButtonItem.init(title: "Edit", style: UIBarButtonItemStyle.done, target: self, action: #selector(TaskViewController.goToEditTaskView))
         self.navigationItem.rightBarButtonItem = editButton
         self.navigationItem.title = task.task_name!
         // Do any additional setup after loading the view, typically from a nib.
@@ -29,23 +29,23 @@ class TaskViewController: UIViewController, UIPickerViewDataSource, UIPickerView
     
     func goToEditTaskView() -> Void {
         print("SEGUE?")
-        self.performSegueWithIdentifier("editTask", sender: self)
+        self.performSegue(withIdentifier: "editTask", sender: self)
     }
 
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return pickerDataSource.count;
     }
     
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return pickerDataSource[row]
     }
     
     func backButtonPressed() {
-        self.navigationController?.popViewControllerAnimated(true)
+        self.navigationController?.popViewController(animated: true)
     }
     
     override func didReceiveMemoryWarning() {

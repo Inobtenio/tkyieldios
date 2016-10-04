@@ -14,8 +14,8 @@ class NewOrEditTaskViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.navigationItem.title = "New Task"
-        let doneButton = UIBarButtonItem.init(title: "Done", style: UIBarButtonItemStyle.Done, target: self, action: nil)
-        let cancelButton = UIBarButtonItem.init(title: "Cancel", style: UIBarButtonItemStyle.Plain, target: self, action: #selector(NewOrEditTaskViewController.backButtonPressed))
+        let doneButton = UIBarButtonItem.init(title: "Done", style: UIBarButtonItemStyle.done, target: self, action: nil)
+        let cancelButton = UIBarButtonItem.init(title: "Cancel", style: UIBarButtonItemStyle.plain, target: self, action: #selector(NewOrEditTaskViewController.backButtonPressed))
         self.navigationItem.rightBarButtonItem = doneButton
         self.navigationItem.leftBarButtonItem = cancelButton
         // Do any additional setup after loading the view.
@@ -27,8 +27,8 @@ class NewOrEditTaskViewController: UIViewController {
     }
     
     func backButtonPressed() {
-        print(self.navigationController?.parentViewController)
-        self.dismissViewControllerAnimated(true) { 
+        print(self.navigationController?.parent)
+        self.dismiss(animated: true) { 
             print("DISMISSED")
         }
     }

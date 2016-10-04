@@ -175,6 +175,7 @@
 					0AE2D5261D5AB04E0032FDAB = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = 78552L2ZNN;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -350,6 +351,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tektonlabs.tkyield;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -366,6 +368,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tektonlabs.tkyield;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

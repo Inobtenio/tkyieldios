@@ -13,53 +13,53 @@ class TodayViewController: UIViewController {
     @IBOutlet weak var userName: UILabel!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var todayTotal: UILabel!
-    var date = NSDate()
-    let dateFormatter = NSDateFormatter()
+    var date = Date()
+    let dateFormatter = DateFormatter()
     
-    func todayOrDate(date: NSDate) -> String {
-        return dateFormatter.stringFromDate(date) == dateFormatter.stringFromDate(NSDate()) ? "Today" : dateFormatter.stringFromDate(date)
+    func todayOrDate(_ date: Date) -> String {
+        return dateFormatter.string(from: date) == dateFormatter.string(from: Date()) ? "Today" : dateFormatter.string(from: date)
     }
     
-    func changeDate(direction: String) -> Void {
+    func changeDate(_ direction: String) -> Void {
         let seconds = direction == "previous" ? -86400 : 86400
-        date = date.dateByAddingTimeInterval(Double(seconds))
+        date = date.addingTimeInterval(Double(seconds))
         self.navigationItem.title = todayOrDate(date)
-        NSNotificationCenter.defaultCenter().postNotificationName("load", object: nil, userInfo: ["date": date])
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "load"), object: nil, userInfo: ["date": date])
     }
     
-    func secondsToHoursMinutesString (seconds : Int) -> String {
+    func secondsToHoursMinutesString (_ seconds : Int) -> String {
         let (h,m) = (seconds / 3600, (seconds % 3600) / 60)
         return NSString(format: "%0.2d:%0.2d",h,m) as String
     }
     
-    func setTotal(notification: NSNotification) -> Void {
-        self.todayTotal.text = secondsToHoursMinutesString(notification.userInfo!["total"] as! Int)
+    func setTotal(_ notification: Notification) -> Void {
+        self.todayTotal.text = secondsToHoursMinutesString((notification as NSNotification).userInfo!["total"] as! Int)
     }
     
-    @IBAction func nextDay(sender: AnyObject) {
+    @IBAction func nextDay(_ sender: AnyObject) {
         changeDate("next")
     }
-    @IBAction func previousDay(sender: AnyObject) {
+    @IBAction func previousDay(_ sender: AnyObject) {
         changeDate("previous")
     }
     
     func goToNewTaskView() -> Void {
         print("SEGUE?")
-        self.performSegueWithIdentifier("newTask", sender: self)
+        self.performSegue(withIdentifier: "newTask", sender: self)
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        let button = UIBarButtonItem.init(image: UIImage.init(named: "add_blue"), style: UIBarButtonItemStyle.Done, target: self, action: #selector(TodayViewController.goToNewTaskView))
+        let button = UIBarButtonItem.init(image: UIImage.init(named: "add_blue"), style: UIBarButtonItemStyle.done, target: self, action: #selector(TodayViewController.goToNewTaskView))
         self.navigationItem.rightBarButtonItem = button
         dateFormatter.dateFormat = "EEEE, dd MMM"
         self.navigationItem.title = "Today"
         userName.text = UserPreferences.sharedInstance.name
-        if let url = NSURL(string: "https://assets-cdn.github.com/images/modules/logos_page/Octocat.png") {
-            if let data = NSData(contentsOfURL: url) {
+        if let url = URL(string: "https://assets-cdn.github.com/images/modules/logos_page/Octocat.png") {
+            if let data = try? Data(contentsOf: url) {
                 userProfilePic.image = UIImage(data: data)
             }
         }
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TodayViewController.setTotal(_:)),name:"setTotal", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TodayViewController.setTotal(_:)),name:NSNotification.Name(rawValue: "setTotal"), object: nil)
         // Do any additional setup after loading the view, typically from a nib.
     }
     

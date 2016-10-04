@@ -15,27 +15,27 @@ class ViewController: UIViewController {
     @IBOutlet weak var passwordInput: UITextField!
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    var alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.Alert)
-    let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { (result : UIAlertAction) -> Void in
+    var alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.alert)
+    let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default) { (result : UIAlertAction) -> Void in
         print("OK")
     };
     
     
-    @IBAction func loginButton(sender: UIButton) {
+    @IBAction func loginButton(_ sender: UIButton) {
         if (sender as NSObject == self.loginButton ){
             self.activityIndicator.startAnimating()
             passwordInput.resignFirstResponder()
             emailInput.resignFirstResponder()
-            UIApplication.sharedApplication().beginIgnoringInteractionEvents()
+            UIApplication.shared.beginIgnoringInteractionEvents()
             NetworkManager.sharedInstance.makeAuthRequest(emailInput.text!, password: passwordInput.text!, completion: { (errorMessage) in
                 self.activityIndicator.stopAnimating()
-                UIApplication.sharedApplication().endIgnoringInteractionEvents()
+                UIApplication.shared.endIgnoringInteractionEvents()
                 if (errorMessage.empty()){
-                    self.performSegueWithIdentifier("loginSegue", sender: self)
+                    self.performSegue(withIdentifier: "loginSegue", sender: self)
                 } else {
                     self.alertController.title = errorMessage.message == nil ? "Error" : errorMessage.message
                     self.alertController.message = errorMessage.reason
-                    self.presentViewController(self.alertController, animated: true, completion: nil)
+                    self.present(self.alertController, animated: true, completion: nil)
                 }
             })
         }

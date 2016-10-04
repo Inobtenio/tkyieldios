@@ -31,7 +31,7 @@ class TimeSheet: NSObject {
         self.task_name = json["task_name"] as? String
     }
     
-    static func init_from_json_array(json: NSArray) -> [TimeSheet] {
+    static func init_from_json_array(_ json: NSArray) -> [TimeSheet] {
         var a = [TimeSheet]()
         for piece in json {
             let ts = TimeSheet.init(json: piece as! NSDictionary)

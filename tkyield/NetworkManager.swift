@@ -28,6 +28,7 @@ class NetworkManager: NSObject{
             if error == nil {
                 do{
                     UserPreferences.sharedInstance.setValues(try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions()) as! NSDictionary)
+                    NSUserDefaults.standardUserDefaults().setObject(try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions()) as! NSDictionary, forKey: "userDefaults")
                     if (!UserPreferences.sharedInstance.valid()){
                         errorMessage = NetworkError.init(json: try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions())["error"] as! NSDictionary)
                     }

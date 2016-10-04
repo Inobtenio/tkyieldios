@@ -12,10 +12,10 @@ class TasksTableViewController: UITableViewController {
     var timesheets = [TimeSheet]()
     let textCellIdentifier = "todayCell"
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    var date = NSDate()
+    var date = Date()
     
     
-    func refresh(refreshControl: UIRefreshControl) {
+    func refresh(_ refreshControl: UIRefreshControl) {
         // Do your job, when done:
         NetworkManager.sharedInstance.makeTimesheetsOfDateRequest(self.date, completion: { (errorMessage) in
             self.activityIndicator.stopAnimating()
@@ -33,17 +33,17 @@ class TasksTableViewController: UITableViewController {
         refreshControl.endRefreshing()
     }
     
-    func callFillData(notification: NSNotification) -> Void {
-        self.date = notification.userInfo!["date"] as! NSDate
+    func callFillData(_ notification: Notification) -> Void {
+        self.date = (notification as NSNotification).userInfo!["date"] as! Date
         self.fillingDataRequest(self.date)
     }
     
-    func callRefreshData(notification: NSNotification) -> Void {
+    func callRefreshData(_ notification: Notification) -> Void {
         let refreshControl = UIRefreshControl()
         self.refresh(refreshControl)
     }
     
-    func fillingDataRequest(date: NSDate) -> Void {
+    func fillingDataRequest(_ date: Date) -> Void {
         self.activityIndicator.startAnimating()
         NetworkManager.sharedInstance.makeTimesheetsOfDateRequest(date, completion: { (errorMessage) in
             self.activityIndicator.stopAnimating()
@@ -60,7 +60,7 @@ class TasksTableViewController: UITableViewController {
         })
     }
     
-    func removeTimesheetRequest(timesheet_id: Int) -> Void {
+    func removeTimesheetRequest(_ timesheet_id: Int) -> Void {
         NetworkManager.sharedInstance.deleteTimesheet(timesheet_id) { (errorMessage) in
             if (errorMessage.empty()){
                 self.noDataBackground()
@@ -74,44 +74,44 @@ class TasksTableViewController: UITableViewController {
     
     func noDataBackground() -> Void {
         if (self.timesheets.count == 0){
-            let noDataLabel: UILabel = UILabel(frame: CGRectMake(0, 0, self.tableView.bounds.size.width, self.tableView.bounds.size.height))
+            let noDataLabel: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.tableView.bounds.size.width, height: self.tableView.bounds.size.height))
             noDataLabel.text = "No tasks  :/"
             noDataLabel.textColor = UIColor(red: 22.0/255.0, green: 106.0/255.0, blue: 176.0/255.0, alpha: 1.0)
-            noDataLabel.textAlignment = NSTextAlignment.Center
+            noDataLabel.textAlignment = NSTextAlignment.center
             self.tableView.backgroundView = noDataLabel
         }
     }
     
     func getCellsData() -> Void {
         var total = 0
-        for row in 0..<tableView.numberOfRowsInSection(0){
-            let indexPath = NSIndexPath(forRow: row, inSection: 0)
-            tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: UITableViewScrollPosition.Top, animated: false)
-            let cell = tableView.cellForRowAtIndexPath(indexPath) as! TodayTableCell
+        for row in 0..<tableView.numberOfRows(inSection: 0){
+            let indexPath = IndexPath(row: row, section: 0)
+            tableView.scrollToRow(at: indexPath, at: UITableViewScrollPosition.top, animated: false)
+            let cell = tableView.cellForRow(at: indexPath) as! TodayTableCell
             total += cell.seconds
         }
-        NSNotificationCenter.defaultCenter().postNotificationName("setTotal", object: nil, userInfo: ["total": total])
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "setTotal"), object: nil, userInfo: ["total": total])
     }
     
-    func stopAllTasks(notification: NSNotification) -> Void {
-        for row in 0..<tableView.numberOfRowsInSection(0){
-            let indexPath = NSIndexPath(forRow: row, inSection: 0)
-            tableView.scrollToRowAtIndexPath(indexPath, atScrollPosition: UITableViewScrollPosition.Top, animated: false)
-            let cell = tableView.cellForRowAtIndexPath(indexPath) as! TodayTableCell
+    func stopAllTasks(_ notification: Notification) -> Void {
+        for row in 0..<tableView.numberOfRows(inSection: 0){
+            let indexPath = IndexPath(row: row, section: 0)
+            tableView.scrollToRow(at: indexPath, at: UITableViewScrollPosition.top, animated: false)
+            let cell = tableView.cellForRow(at: indexPath) as! TodayTableCell
             cell.timesheet.running = false
         }
         self.tableView.reloadData()
 //        self.tableView.setContentOffset(CGPointMake(0.0, -self.tableView.contentInset.top), animated: false)
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         fillingDataRequest(self.date)
         activityIndicator.hidesWhenStopped = true;
         let refreshControl = UIRefreshControl()
         self.tableView.addSubview(refreshControl)
         self.tableView.delegate = self
         self.tableView.dataSource = self
-        refreshControl.addTarget(self, action: #selector(refresh(_:)), forControlEvents: .ValueChanged)
+        refreshControl.addTarget(self, action: #selector(refresh(_:)), for: .valueChanged)
     }
 
     override func viewDidLoad() {
@@ -121,9 +121,9 @@ class TasksTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TasksTableViewController.callFillData(_:)),name:"load", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TasksTableViewController.callRefreshData(_:)),name:"refresh", object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(TasksTableViewController.stopAllTasks(_:)),name:"stopTasks", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TasksTableViewController.callFillData(_:)),name:NSNotification.Name(rawValue: "load"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TasksTableViewController.callRefreshData(_:)),name:NSNotification.Name(rawValue: "refresh"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(TasksTableViewController.stopAllTasks(_:)),name:NSNotification.Name(rawValue: "stopTasks"), object: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -131,37 +131,37 @@ class TasksTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if(segue.identifier == "aSegue") {
-            let row = tableView.indexPathForSelectedRow?.row
-            let taskViewController = (segue.destinationViewController as! TaskViewController)
+            let row = (tableView.indexPathForSelectedRow as NSIndexPath?)?.row
+            let taskViewController = (segue.destination as! TaskViewController)
             taskViewController.task = TimeSheet.current_timesheets[row!]
         }
     }
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return timesheets.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("todayCell", forIndexPath: indexPath) as! TodayTableCell
-        cell.timesheet = timesheets[indexPath.row]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "todayCell", for: indexPath) as! TodayTableCell
+        cell.timesheet = timesheets[(indexPath as NSIndexPath).row]
         cell.setUp()
-        print(timesheets.count - indexPath.row)
+        print(timesheets.count - (indexPath as NSIndexPath).row)
         return cell
     }
 
 
     // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
@@ -169,12 +169,12 @@ class TasksTableViewController: UITableViewController {
 
 
     // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
             // Delete the row from the data source
-            removeTimesheetRequest(timesheets[indexPath.row].id!)
-            timesheets.removeAtIndex(indexPath.row)
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            removeTimesheetRequest(timesheets[(indexPath as NSIndexPath).row].id!)
+            timesheets.remove(at: (indexPath as NSIndexPath).row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
 

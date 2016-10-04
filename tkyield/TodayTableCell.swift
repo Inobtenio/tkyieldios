@@ -13,7 +13,7 @@ class TodayTableCell: UITableViewCell {
     var timesheet = TimeSheet(json: [:])
     var seconds = Int()
     var elapsedSeconds = Double()
-    var timer: NSTimer?
+    var timer: Timer?
     @IBOutlet weak var projectName: UILabel!
     @IBOutlet weak var taskName: UILabel!
     @IBOutlet weak var currentDuration: UILabel!
@@ -21,13 +21,13 @@ class TodayTableCell: UITableViewCell {
     @IBOutlet weak var clock: UIImageView!
     @IBOutlet weak var statusButton: UIButton!
     
-    @IBAction func actionButton(sender: AnyObject) {
+    @IBAction func actionButton(_ sender: AnyObject) {
 //        NSNotificationCenter.defaultCenter().postNotificationName("stopTasks", object: nil)
         NetworkManager.sharedInstance.toggleTimesheet(self.timesheet.id!) { (timesheet, errorMessage) in
             if (errorMessage.empty()){
 //                self.timesheet = timesheet
 //                print(self.timesheet.running)
-                NSNotificationCenter.defaultCenter().postNotificationName("refresh", object: nil)
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "refresh"), object: nil)
                 self.setUp()
             } else {
                 
@@ -40,18 +40,18 @@ class TodayTableCell: UITableViewCell {
         // Initialization code
     }
     
-    func secondsToHoursMinutesString (seconds : Int) -> String {
+    func secondsToHoursMinutesString (_ seconds : Int) -> String {
         let (h,m) = (seconds / 3600, (seconds % 3600) / 60)
         return NSString(format: "%0.2d:%0.2d",h,m) as String
     }
     
     func setDuration() -> Void {
             seconds += 60
-            statusButton.setTitle(secondsToHoursMinutesString(seconds), forState: .Normal)
+            statusButton.setTitle(secondsToHoursMinutesString(seconds), for: UIControlState())
     }
     
-    func rotateView(view: UIView, duration: Double = 1, key: String) {
-        if view.layer.animationForKey(key) == nil {
+    func rotateView(_ view: UIView, duration: Double = 1, key: String) {
+        if view.layer.animation(forKey: key) == nil {
             let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation")
             
             rotationAnimation.fromValue = 0.0
@@ -59,48 +59,48 @@ class TodayTableCell: UITableViewCell {
             rotationAnimation.duration = duration
             rotationAnimation.repeatCount = Float.infinity
             
-            view.layer.addAnimation(rotationAnimation, forKey: key)
+            view.layer.add(rotationAnimation, forKey: key)
         }
     }
     
-    func stopRotatingView(view: UIView, key: String) {
-        if view.layer.animationForKey(key) != nil {
-            view.layer.removeAnimationForKey(key)
+    func stopRotatingView(_ view: UIView, key: String) {
+        if view.layer.animation(forKey: key) != nil {
+            view.layer.removeAnimation(forKey: key)
         }
     }
     
-    func imageTransition(toImage: UIImage) -> Void {
-        UIView.transitionWithView(self.statusButton.imageView!,
+    func imageTransition(_ toImage: UIImage) -> Void {
+        UIView.transition(with: self.statusButton.imageView!,
                                   duration:0.5,
-                                  options: UIViewAnimationOptions.BeginFromCurrentState,
-                                  animations: { self.statusButton.setImage(toImage, forState: UIControlState.Normal) },
+                                  options: UIViewAnimationOptions.beginFromCurrentState,
+                                  animations: { self.statusButton.setImage(toImage, for: UIControlState()) },
                                   completion: nil)
     }
     
     func setButtonAndDuration() -> Void {
-        let dateFormatter = NSDateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZZ"
-        self.statusButton.backgroundColor = UIColor.clearColor()
+        self.statusButton.backgroundColor = UIColor.clear
         if (timesheet.running!){
             self.statusButton.backgroundColor = UIColor.init(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1)
-            self.statusButton.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
-            let date = dateFormatter.dateFromString(self.timesheet.start_time!)
-            let elapsedTime = NSDate().timeIntervalSinceDate(date!)
+            self.statusButton.setTitleColor(UIColor.white, for: UIControlState())
+            let date = dateFormatter.date(from: self.timesheet.start_time!)
+            let elapsedTime = Date().timeIntervalSince(date!)
             self.seconds += Int(elapsedTime)
-            if (self.timer == nil || !self.timer!.valid){
-                self.timer = NSTimer.scheduledTimerWithTimeInterval(60, target: self, selector: #selector(TodayTableCell.setDuration), userInfo: nil, repeats: true)
+            if (self.timer == nil || !self.timer!.isValid){
+                self.timer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(TodayTableCell.setDuration), userInfo: nil, repeats: true)
             }
         } else {
             elapsedSeconds = 0
-            self.statusButton.backgroundColor = UIColor.whiteColor()
+            self.statusButton.backgroundColor = UIColor.white
             self.statusButton.layer.borderWidth = 1
-            self.statusButton.layer.borderColor = UIColor.init(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1).CGColor
-            self.statusButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
-            if ( self.timer != nil && self.timer!.valid ){
+            self.statusButton.layer.borderColor = UIColor.init(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1).cgColor
+            self.statusButton.setTitleColor(UIColor.black, for: UIControlState())
+            if ( self.timer != nil && self.timer!.isValid ){
                 timer!.invalidate()
             }
         }
-        statusButton.setTitle(secondsToHoursMinutesString(seconds), forState: UIControlState.Normal)
+        statusButton.setTitle(secondsToHoursMinutesString(seconds), for: UIControlState())
         
     }
     
@@ -111,7 +111,7 @@ class TodayTableCell: UITableViewCell {
         setButtonAndDuration()
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
         // Configure the view for the selected state
     }
